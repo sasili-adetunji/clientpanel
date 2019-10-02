@@ -1,38 +1,50 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-// import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-// import { compose } from 'redux'
+import { compose } from 'redux'
 import { firestoreConnect } from 'react-redux-firebase'
-class AddClient extends Component {
+import Spinner from '../layout/Spinner'
 
-    state = {
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        balance: ''
+
+class EditClient extends Component {
+
+    constructor(props) {
+        super()
+
+        this.firstNameInput = React.createRef();
+        this.lastNameInput = React.createRef();
+        this.emailInput = React.createRef();
+        this.phoneInput = React.createRef();
+        this.balanceInput = React.createRef();
+
     }
 
-    onChange = (e) => this.setState({ [e.target.name]: e.target.value })
+
+
 
     onSubmit = (e) => {
         e.preventDefault();
-        const newClient = this.state
-        const { firestore, history } = this.props;
-        if (newClient.balance === '') {
-            newClient.balance = 0;
-
+        const { firestore, history, client } = this.props;
+        const updatedClient = {
+            firstName: this.firstNameInput.current.value,
+            lastName: this.lastNameInput.current.value,
+            email: this.emailInput.current.value,
+            phone: this.phoneInput.current.value,
+            balance: this.balanceInput.current.value === '' ? 0 : this.balanceInput.current.value
         }
-        firestore.add({collection: 'clients'}, newClient).then(() => {
+        firestore.update({collection: 'clients', doc: client.id}, updatedClient).then(() => {
             history.push('/')
         })
     }
 
-    render(){
-        return (
-            <div>
+    render() {
+        const {client} = this.props
+
+        if (client ) {
+
+            return (
+                <div>
                 <div className="row">
                     <div className="col-md-6">
                         <Link to="/" className="btn btn-link">
@@ -55,8 +67,8 @@ class AddClient extends Component {
                                 name="firstName"
                                 minLength="2"
                                 required
-                                onChange={this.onChange}
-                                value={this.state.firstName}
+                                defaultValue={client.firstName}
+                                ref={this.firstNameInput}
                             />
                         </div>
                         <div className="form-group">
@@ -67,8 +79,9 @@ class AddClient extends Component {
                                 name="lastName"
                                 minLength="2"
                                 required
-                                onChange={this.onChange}
-                                value={this.state.lastName}
+                                defaultValue={client.lastName}
+                                ref={this.lastNameInput}
+
                             />
                         <div className="form-group">
                             <label htmlFor="email"> Email</label>
@@ -76,8 +89,9 @@ class AddClient extends Component {
                                 type="email"
                                 className="form-control"
                                 name="email"
-                                onChange={this.onChange}
-                                value={this.state.email}
+                                defaultValue={client.email}
+                                ref={this.emailInput}
+
                             />
                         </div>
                         <div className="form-group">
@@ -88,8 +102,9 @@ class AddClient extends Component {
                                 name="phone"
                                 minLength="10"
                                 required
-                                onChange={this.onChange}
-                                value={this.state.phone}
+                                defaultValue={client.phone}
+                                ref={this.phoneInput}
+
                             />
                         </div>
                         <div className="form-group">
@@ -98,24 +113,36 @@ class AddClient extends Component {
                                 type="text"
                                 className="form-control"
                                 name="balance"
-                                onChange={this.onChange}
-                                value={this.state.balance}
+                                defaultValue={client.balance}
+                                ref={this.balanceInput}
+
                             />
                         </div>
-                        <input type="submit" value="Submit" className="btn btn-block btn-primary"/>
+                        <input type="submit" value="Edit Client" className="btn btn-block btn-primary"/>
                         </div>
                     </form>
                     </div>
 
                 </div>
             </div>
-        )
+            )
+        } else {
+            return (
+                <Spinner />
+            )
+        }
     }
 }
 
-AddClient.propTypes = {
+EditClient.propTypes = {
     firestore: PropTypes.object.isRequired
 }
 
-
-export default firestoreConnect()(AddClient);
+export default compose(
+    firestoreConnect((props) => [
+        {collection: 'clients', storeAs: 'client', doc: props.match.params.id}
+    ]),
+    connect(({ firestore: { ordered } }, props) => ({
+        client: ordered.client && ordered.client[0]
+    }))
+  )(EditClient)
