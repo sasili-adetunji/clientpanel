@@ -17,7 +17,7 @@ class Settings extends Component {
         setDisableBalanceOnAdd()
     }
 
-    disableBalanceOnEditChange = () => {
+    disabledBalanceOnEditChange = () => {
         const { setDisableBalanceOnEdit } = this.props
         setDisableBalanceOnEdit()
     }
@@ -63,7 +63,7 @@ class Settings extends Component {
                                 type="checkbox"
                                 name="disabledBalanceOnEdit"
                                 checked={!!disabledBalanceOnEdit}
-                                onChange={this.disableBalanceOnEditChange}
+                                onChange={this.disabledBalanceOnEditChange}
                             />
                         </div>
                     </form>
