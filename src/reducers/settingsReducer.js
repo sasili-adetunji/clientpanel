@@ -3,7 +3,7 @@ import {DISABLE_BALANCE_ON_ADD, DISABLE_BALANCE_ON_EDIT, ALLOW_REGISTRATION} fro
 const initialState = {
     disabledBalanceOnAdd: true,
     disabledBalanceOnEdit: false,
-    allowregistration: false,
+    allowRegistration: false,
 
 }
 export default (state=initialState, action) => {
@@ -22,7 +22,7 @@ export default (state=initialState, action) => {
         case ALLOW_REGISTRATION:
             return {
                 ...state,
-                allowregistration: !state.allowregistration
+                allowRegistration: !state.allowRegistration
             }
         default:
             return state
